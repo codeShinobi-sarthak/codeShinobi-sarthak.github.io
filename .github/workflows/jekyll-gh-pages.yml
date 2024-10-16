@@ -1,30 +1,33 @@
-name: Deploy Vite React App to GitHub Pages
+name: Build and Deploy Jekyll Site to GitHub Pages
 
 on:
   push:
     branches:
-      - main  # Trigger deployment on push to main branch
+      - main  # Trigger the workflow on push to the 'main' branch
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          node-version: '16'  # Make sure Node.js version matches your project setup
+          ruby-version: '3.0'  # Specify the Ruby version you want to use
 
-      - name: Install dependencies and build
+      - name: Install Jekyll and Bundler
         run: |
-          npm install
-          npm run build
+          gem install bundler
+          bundle install
+
+      - name: Build the Jekyll site
+        run: bundle exec jekyll build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./_site  # This is the default Jekyll output directory
